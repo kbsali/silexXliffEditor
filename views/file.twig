@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>Xliff editor</title>
+<link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection"/>
+
+<style>
+tr:hover {background-color: #e6efc2 !important;border-color:#c6d880;}
+td.trans {width: 50%;}
+textarea {width: 99%;}
+.c {text-align: center;}
+
+td.idx {white-space: nowrap;}
+
+#hinfo {position: fixed;top: 100px;right: 0;text-align: center;vertical-align: middle;}
+/*
+#hinfo a {border: 1px solid #000;padding: 5px;background: #aaa none repeat scroll 0 0;color: #fff !important;font-size: 1em;font-weight: bold;}
+#hinfo a:hover {background: #fff none repeat scroll 0 0;color: #aaa !important;}
+*/
+#simplemodal-overlay {background-color: #000;cursor: wait;}
+#simplemodal-container {width: 600px;background-color: #fff;border: 4px solid #444;padding: 12px;}
+#simplemodal-container .simplemodal-data {padding: 8px;}
+#simplemodal-container a.modalCloseImg {background: url(/js/x.png) no-repeat;width: 25px;height: 29px;display: inline;z-index: 3200;position: absolute;top: -15px;right: -16px;cursor: pointer;}
+</style>
+<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script> -->
+<script type="text/javascript" src="/js/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="/js/jquery.inlineEdit.min.js"></script>
+<script type="text/javascript" src="/js/jquery.autogrow.min.js"></script>
+<script type="text/javascript" src="/js/jquery.jkey.min.js"></script>
+<script type="text/javascript" src="/js/jquery.simplemodal.1.4.1.min.js"></script>
+<script type="text/javascript" src="/js/jquery.translate-1.4.1.min.js"></script>
+<script type="text/javascript" src="/js/jquery.sort.js"></script>
+<script type="text/javascript">
+$(function(){
+  $.inlineEdit({
+    //target: '?type=target&f={{ fileName }}&id=',
+    target: '/update/{{ fileName }}/',
+    //remove: '?remove&type=target&f={{ fileName }}&id='
+    remove: '/delete/{{ fileName }}/'
+  }, {
+    animate: false,
+    filterElementValue: function($o) {
+      return $o.html();
+    }
+  });
+});
+$(document).ready(function(){
+
+  // sort columns!
+  var th = jQuery('th'),
+    inverse = false;
+  th.click(function(){
+    var header = $(this),
+        index = header.index();
+    header
+      .closest('table')
+      .find('td')
+      .filter(function(){
+        return $(this).index() === index;
+      })
+      .sort(function(a, b){
+        a = $(a).text();
+        b = $(b).text();
+        return (
+          isNaN(a) || isNaN(b) ?
+            a > b : +a > +b
+          ) ?
+            inverse ? -1 : 1 :
+            inverse ? 1 : -1;
+      }, function(){
+        return this.parentNode;
+      });
+    inverse = !inverse;
+  });
+
+  if(typeof $(".source > textarea")!="undefined") {
+    $(".source > textarea").width( $(".source").width() ).attr("readonly", "readonly");
+    $(".editableMulti").click(function(){
+      var o = $(this).find("textarea");
+      o.width($(this).width()).autogrow();
+    });
+    $('#f, #show_empty, #show_dup').change(function(){
+      window.location = '?f=' + $('#f').val() + '&show_empty=' + $('#show_empty').val() + '&show_dup=' + $('#show_dup').val();
+    });
+    //----------------------------------------------------------------------------
+    $(window).jkey('shift+ctrl+g', function(){
+      var trid = $('.editFieldWrapper').parent().parent().attr('id');
+      var from = $('#'+trid+' td.source textarea').val();
+      $.translate(from, '{{ langSource }}', '{{ langTarget }}', {
+        complete: function(translation){
+          $('.editFieldWrapper textarea.editField').val(translation);
+        }
+      });
+    })
+    $(window).jkey('esc',function(){
+      $('.editFieldCancel').click();
+    });
+    $(window).jkey('ctrl+m',function(){
+      $('#hinfo').click();
+    });
+    $(window).jkey('ctrl+e',function(){
+      var newVal = $('#show_empty').val()==0 ? 1 : 0;
+      window.location = '?f=' + $('#f').val() + '&show_empty=' + newVal;
+    });
+    $(window).jkey('ctrl+d',function(){
+      var newVal = $('#show_dup').val()==0 ? 1 : 0;
+      window.location = '?f=' + $('#f').val() + '&show_dup=' + newVal;
+    });
+    $(window).jkey('shift+ctrl+down', function(){
+      move('next', true);
+    });
+    $(window).jkey('ctrl+down', function(){
+      move('next', false);
+    });
+    $(window).jkey('shift+ctrl+up', function(){
+      move('prev', true);
+    });
+    $(window).jkey('ctrl+up', function(){
+      move('prev', false);
+    });
+    //----------------------------------------------------------------------------
+    $('#hinfo').click(function(){
+      $('#info').modal();
+      return false;
+    });
+    var move = function(prevNext, save){
+      var tr = $('.editFieldWrapper').parent().parent();
+      // do we want to up or down?
+      if(prevNext == 'next') {
+        var ntr = $('.editFieldWrapper').parent().parent().next();
+      } else {
+        var ntr = $('.editFieldWrapper').parent().parent().prev();
+      }
+      ed(tr, ntr, save);
+    };
+    var ed = function(tr, ntr, save){
+      if(ntr!=null) {
+        if(save==true) {
+          $('.editFieldSaveControllers button').click();
+        } else {
+          $('.editFieldCancel').click();
+        }
+        $('#id'+ntr.attr('id')).click();
+      }
+    };
+  }
+});
+</script>
+</head>
+<body>
+
+<?php if($showDup === true && empty($dups)) : ?>
+<div class="notice c">No duplicates</div>
+<?php endif ?>
+<span id="hinfo" class="{{ isWritable ? 'success' : 'error' }}"><a href="#info">Menu</a><br/>{{ langSource }} -> {{ langTarget }}</span>
+<div id="info" style="display:none;">
+  <ul>
+    {% if isWritable %}
+    <li class="success"><a href="/reindex/{{ fileName }}">Re-index file</a><br/></li>
+    {% else %}
+    <li class="error"><a href="/permission/{{ fileName }}">File NOT writable (readonly mode)!</a><br/></li>
+    {% endif %}
+    <li><label for="f">Edited file :</label> <?php echo html::dropdown('f', $fileNames, $idx) ?></li>
+    <li><label for="show_empty">Empty targets?</label> <?php echo html::dropdown('show_empty', array(0 => 'No', 1 => 'Yes'), $showEmpty) ?></li>
+    <li><label for="show_dup">Show duplicates?</label> <?php echo html::dropdown('show_dup', array(0 => 'No', 1 => 'Yes'), $showDup) ?></li>
+    <li><label>basedir :</label> {{ baseDir }}</li>
+    <li><label>last extract :</label> {{ dateExtract|date('r') }}</li>
+    <li><label>last save :</label> {{ dateSave|date('r') }}</li>
+    <li><label>translations (from -> to) :</label> {{ langSource }} -> {{ langTarget }}</li>
+  </ul>
+  <h4>Help / Shortcuts</h4>
+  <ul>
+    <li><code>ctrl+m</code> : opens up modal menu</li>
+    <li><code>ctrl+up</code> : move selection up</li>
+    <li><code>ctrl+down</code> : move selection down</li>
+    <li><code>ctrl+shift+up</code> : saves current edit + move selection up</li>
+    <li><code>ctrl+shift+down</code> : saves current edit + move selection down</li>
+    <li><code>ctrl+shift+g</code> : translates the source string using google translate</li>
+    <li><code>ctrl+e</code> : only show empty <code>target</code></li>
+    <li><code>ctrl+d</code> : only show duplicated <code>source</code></li>
+    <li><code>esc</code> : closes opened selection without saving / closes modal menu is opened</li>
+  </ul>
+</div>
+
+<table id="data">
+<thead>
+<tr>
+    <th>ID</th>
+    <th id="source">Source</th>
+    <th id="target">Target</th>
+</tr>
+</thead>
+<tbody>
+
+{% for k, ts in oXml %}
+{% set del = '<a href="/delete/' ~ fileName ~ "/" ~ ts.id ~ '">X</a>' %}
+<tr id="{{ ts.id }}" {{ k is odd ? 'class="info"' : "" }}>
+    <td class="r idx">{{ isWritable ? del|raw : "" }} {{ ts.id }}</td>
+    <td class="trans source"><textarea>{{ ts.source is empty ? "&nbsp;" : ts.source }}</textarea></td>
+    <td id="id{{ ts.id }}" class="trans target id{{ ts.id }}{{ isWritable ? " editableMulti" : "" }}">{{ ts.target is empty ? "&nbsp;" : ts.target }}</td>
+</tr>
+{% endfor %}
+
+</tbody>
+</table>
+
+</body>
+</html>
