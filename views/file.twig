@@ -1,37 +1,6 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-<title>Xliff editor</title>
-<link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection"/>
+{% extends "layout.twig" %}
 
-<style>
-tr:hover {background-color: #e6efc2 !important;border-color:#c6d880;}
-td.trans {width: 50%;}
-textarea {width: 99%;}
-.c {text-align: center;}
-
-td.idx {white-space: nowrap;}
-
-#hinfo {position: fixed;top: 100px;right: 0;text-align: center;vertical-align: middle;}
-/*
-#hinfo a {border: 1px solid #000;padding: 5px;background: #aaa none repeat scroll 0 0;color: #fff !important;font-size: 1em;font-weight: bold;}
-#hinfo a:hover {background: #fff none repeat scroll 0 0;color: #aaa !important;}
-*/
-#simplemodal-overlay {background-color: #000;cursor: wait;}
-#simplemodal-container {width: 600px;background-color: #fff;border: 4px solid #444;padding: 12px;}
-#simplemodal-container .simplemodal-data {padding: 8px;}
-#simplemodal-container a.modalCloseImg {background: url(/js/x.png) no-repeat;width: 25px;height: 29px;display: inline;z-index: 3200;position: absolute;top: -15px;right: -16px;cursor: pointer;}
-</style>
-<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script> -->
-<script type="text/javascript" src="/js/jquery-1.5.1.min.js"></script>
-<script type="text/javascript" src="/js/jquery.inlineEdit.min.js"></script>
-<script type="text/javascript" src="/js/jquery.autogrow.min.js"></script>
-<script type="text/javascript" src="/js/jquery.jkey.min.js"></script>
-<script type="text/javascript" src="/js/jquery.simplemodal.1.4.1.min.js"></script>
-<script type="text/javascript" src="/js/jquery.translate-1.4.1.min.js"></script>
-<script type="text/javascript" src="/js/jquery.sort.js"></script>
+{% block content %}
 <script type="text/javascript">
 $(function(){
   $.inlineEdit({
@@ -205,6 +174,4 @@ $(document).ready(function(){
 
 </tbody>
 </table>
-
-</body>
-</html>
+{% endblock %}

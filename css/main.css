@@ -1,0 +1,16 @@
+tr:hover {background-color: #e6efc2 !important;border-color:#c6d880;}
+td.trans {width: 50%;}
+textarea {width: 99%;}
+.c {text-align: center;}
+
+td.idx {white-space: nowrap;}
+
+#hinfo {position: fixed;top: 100px;right: 0;text-align: center;vertical-align: middle;}
+/*
+#hinfo a {border: 1px solid #000;padding: 5px;background: #aaa none repeat scroll 0 0;color: #fff !important;font-size: 1em;font-weight: bold;}
+#hinfo a:hover {background: #fff none repeat scroll 0 0;color: #aaa !important;}
+*/
+#simplemodal-overlay {background-color: #000;cursor: wait;}
+#simplemodal-container {width: 600px;background-color: #fff;border: 4px solid #444;padding: 12px;}
+#simplemodal-container .simplemodal-data {padding: 8px;}
+#simplemodal-container a.modalCloseImg {background: url(/js/x.png) no-repeat;width: 25px;height: 29px;display: inline;z-index: 3200;position: absolute;top: -15px;right: -16px;cursor: pointer;}
