@@ -120,9 +120,9 @@ $(document).ready(function(){
 </head>
 <body>
 
-<?php if($showDup === true && empty($dups)) : ?>
+{% if noDuplicate %}
 <div class="notice c">No duplicates</div>
-<?php endif ?>
+{% endif %}
 <span id="hinfo" class="{{ isWritable ? 'success' : 'error' }}"><a href="#info">Menu</a><br/>{{ langSource }} -> {{ langTarget }}</span>
 <div id="info" style="display:none;">
   <ul>
@@ -131,9 +131,9 @@ $(document).ready(function(){
     {% else %}
     <li class="error"><a href="/permission/{{ fileName }}">File NOT writable (readonly mode)!</a><br/></li>
     {% endif %}
-    <li><label for="f">Edited file :</label> <?php echo html::dropdown('f', $fileNames, $idx) ?></li>
-    <li><label for="show_empty">Empty targets?</label> <?php echo html::dropdown('show_empty', array(0 => 'No', 1 => 'Yes'), $showEmpty) ?></li>
-    <li><label for="show_dup">Show duplicates?</label> <?php echo html::dropdown('show_dup', array(0 => 'No', 1 => 'Yes'), $showDup) ?></li>
+    <li><label for="f">Edited file :</label> {{ selectFiles|raw }}</li>
+    <li><label for="empty">Empty targets?</label> {{ selectShowEmpty|raw }}</li>
+    <li><label for="duplicate">Show duplicates?</label> {{ selectShowDuplicate|raw }}</li>
     <li><label>basedir :</label> {{ baseDir }}</li>
     <li><label>last extract :</label> {{ dateExtract|date('r') }}</li>
     <li><label>last save :</label> {{ dateSave|date('r') }}</li>
