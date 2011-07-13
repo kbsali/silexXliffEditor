@@ -2,7 +2,7 @@
 class xliff {
   public static function parse($f) {
     if(!file_exists($f)) {
-      throw Exception($f . ' does not exist');
+      throw new Exception($f . ' does not exist');
     }
     try {
       libxml_use_internal_errors(true);
@@ -15,10 +15,10 @@ class xliff {
             ' Line: ' . $err->line . PHP_EOL .
             ' Column: ' . $err->column . PHP_EOL . PHP_EOL;
         }
-        throw Exception('Error in file ' . $f . ' : ' . $strErr);
+        throw new Exception('Error in file ' . $f . ' : ' . $strErr);
       }
     } catch (Exception $e) {
-      throw Exception('Problem parsing xml : ' . $e->getMessage());
+      throw new Exception('Problem parsing xml : ' . $e->getMessage());
     }
     return $oXml;
   }
