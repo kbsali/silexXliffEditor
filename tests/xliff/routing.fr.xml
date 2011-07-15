@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+  <file datatype="xml" date="2011-06-02T17:36:30Z" source-language="fr" target-language="en">
+    <header>
+      <prop-group name="encoding">
+        <prop prop-type="encoding">UTF-8</prop>
+      </prop-group>
+    </header>
+    <body>
+      <trans-unit id="1">
+        <source>Programmation</source>
+        <target>Schedule</target>
+      </trans-unit>
+      <trans-unit id="4">
+        <source>Wall</source>
+        <target>asdf</target>
+      </trans-unit>
+      <trans-unit id="5">
+        <source>Programme</source>
+        <target>Program </target>
+      </trans-unit>
+      <trans-unit id="6">
+        <source>Carte</source>
+        <target>Map </target>
+      </trans-unit>
+      <trans-unit id="7">
+        <source>Adresse</source>
+        <target>asdfsdfAddress </target>
+      </trans-unit>
+      <trans-unit id="8">
+        <source>Téléphone</source>
+        <target>Phone </target>
+      </trans-unit>
+      <trans-unit id="9">
+        <source>Retour à la fiche du bar</source>
+        <target>Back to bar's page </target>
+      </trans-unit>
+      <trans-unit id="10">
+        <source>Voir le programme du bar</source>
+        <target>See bar's program </target>
+      </trans-unit>
+      <trans-unit id="11">
+        <source>Voir la carte</source>
+        <target>See map </target>
+      </trans-unit>
+      <trans-unit id="12">
+        <source>Précédent</source>
+        <target>Previous </target>
+      </trans-unit>
+      <trans-unit id="13">
+        <source>Suivant</source>
+        <target>Next </target>
+      </trans-unit>
+      <trans-unit id="14">
+        <source>Matches diffusés par le bar %bar%</source>
+        <target>Games retransmitted by bar %bar% </target>
+      </trans-unit>
+      <trans-unit id="15">
+        <source>du %from% au %to%</source>
+        <target>from %from% to %to% </target>
+      </trans-unit>
+      <trans-unit id="16">
+        <source>Services</source>
+        <target>asdf</target>
+      </trans-unit>
+      <trans-unit id="17">
+        <source>TV</source>
+        <target>TV </target>
+      </trans-unit>
+      <trans-unit id="18">
+        <source>Wifi</source>
+        <target>Wifi </target>
+      </trans-unit>
+      <trans-unit id="19">
+        <source>Restaurant</source>
+        <target>Restaurant </target>
+      </trans-unit>
+      <trans-unit id="20">
+        <source>Places assises</source>
+        <target>Seatings </target>
+      </trans-unit>
+      <trans-unit id="21">
+        <source>Capacité max.</source>
+        <target>Maximum capacity </target>
+      </trans-unit>
+      <trans-unit id="22">
+        <source>Horaires d'ouverture</source>
+        <target>Opening hours </target>
+      </trans-unit>
+      <trans-unit id="23">
+        <source>Happy Hours</source>
+        <target>Happy Hours </target>
+      </trans-unit>
+      <trans-unit id="24">
+        <source>Fermé le</source>
+        <target>Closed on </target>
+      </trans-unit>
+      <trans-unit id="25">
+        <source>et</source>
+        <target>and </target>
+      </trans-unit>
+      <trans-unit id="26">
+        <source>[0]0 bar|[1]1 bar|(1,+Inf]%1% bars</source>
+        <target>[0]0 bar|[1]1 bar|(1,+Inf]%1% bars</target>
+      </trans-unit>
+      <trans-unit id="27">
+        <source>Date</source>
+        <target>Date </target>
+      </trans-unit>
+      <trans-unit id="28">
+        <source>Ville</source>
+        <target>City </target>
+      </trans-unit>
+      <trans-unit id="29">
+        <source>Précisez votre adresse</source>
+        <target>Precise you address </target>
+      </trans-unit>
+      <trans-unit id="30">
+        <source>Aucun bar trouvé.</source>
+        <target>No bar found. </target>
+      </trans-unit>
+      <trans-unit id="31">
+        <source>à %distance% km</source>
+        <target>%distance% km away </target>
+      </trans-unit>
+      <trans-unit id="32">
+        <source>Vous avez été redirigé car vous semblez venir d’un terminal mobile.</source>
+        <target>You've been redirected because you see to be using a mobile terminal. </target>
+      </trans-unit>
+      <trans-unit id="33">
+        <source>Si vous souhaitez revenir à la version complète du site,</source>
+        <target>If you want to go back to normal version of the site,</target>
+      </trans-unit>
+      <trans-unit id="34">
+        <source>cliquez ici</source>
+        <target>click here </target>
+      </trans-unit>
+      <trans-unit id="35">
+        <source>Où voir le match ?</source>
+        <target>Where to see the game? </target>
+      </trans-unit>
+      <trans-unit id="36">
+        <source>Votre recherche est incorrecte</source>
+        <target>You search was incorrect </target>
+      </trans-unit>
+      <trans-unit id="37">
+        <source>Sport</source>
+        <target>Sport </target>
+      </trans-unit>
+      <trans-unit id="38">
+        <source>Rechercher</source>
+        <target>Search </target>
+      </trans-unit>
+      <trans-unit id="39">
+        <source>Aucun match trouvé.</source>
+        <target>No game found. </target>
+      </trans-unit>
+      <trans-unit id="40">
+        <source>Faire une autre recherche</source>
+        <target>Make another search </target>
+      </trans-unit>
+      <trans-unit id="41">
+        <source>Annuler</source>
+        <target>Cancel </target>
+      </trans-unit>
+      <trans-unit id="42">
+        <source>Veuillez spécifier une ville</source>
+        <target>Specify a city </target>
+      </trans-unit>
+      <trans-unit id="43">
+        <source>Veuillez spécifier un jour</source>
+        <target>Specify a day </target>
+      </trans-unit>
+      <trans-unit id="44">
+        <source>Veuillez spécifier un sport</source>
+        <target>Specify a sport </target>
+      </trans-unit>
+      <trans-unit id="45">
+        <source>ID invalide</source>
+        <target>Invlalid ID </target>
+      </trans-unit>
+      <trans-unit id="46">
+        <source>Valeurs invalides</source>
+        <target>Invalid values </target>
+      </trans-unit>
+      <trans-unit id="47">
+        <source>Carte Google Maps</source>
+        <target>Google Maps map</target>
+      </trans-unit>
+      <trans-unit id="48">
+        <source>Aujourd'hui</source>
+        <target>Today </target>
+      </trans-unit>
+      <trans-unit id="49">
+        <source>Demain</source>
+        <target>Tomorrow </target>
+      </trans-unit>
+      <trans-unit id="50">
+        <source>Après-demain</source>
+        <target>After tomorrow </target>
+      </trans-unit>
+      <trans-unit id="51">
+        <source>Métros</source>
+        <target>Subways</target>
+      </trans-unit>
+      <trans-unit id="52">
+        <source>Bus</source>
+        <target>Bus</target>
+      </trans-unit>
+      <trans-unit id="53">
+        <source>Transports</source>
+        <target>Transportation</target>
+      </trans-unit>
+      <trans-unit id="54">
+        <source>Lundi</source>
+        <target>Monday</target>
+      </trans-unit>
+      <trans-unit id="55">
+        <source>Mardi</source>
+        <target>Tuesday</target>
+      </trans-unit>
+      <trans-unit id="56">
+        <source>Mercredi</source>
+        <target>Wednesday</target>
+      </trans-unit>
+      <trans-unit id="57">
+        <source>Jeudi</source>
+        <target>Thursday</target>
+      </trans-unit>
+      <trans-unit id="58">
+        <source>Vendredi</source>
+        <target>Friday</target>
+      </trans-unit>
+      <trans-unit id="59">
+        <source>Samedi</source>
+        <target>Saturday</target>
+      </trans-unit>
+      <trans-unit id="60">
+        <source>Dimanche</source>
+        <target>Sunday</target>
+      </trans-unit>
+      <trans-unit id="61">
+        <source>Home</source>
+        <target/>
+      </trans-unit>
+      <trans-unit id="62">
+        <source>jour invalide</source>
+        <target>wrong day</target>
+      </trans-unit>
+      <trans-unit id="63">
+        <source>Comment m'y rendre?</source>
+        <target>How do I get there?</target>
+      </trans-unit>
+      <trans-unit id="64">
+        <source>Programation @ %bar%</source>
+        <target>Schedule @ %bar% vaa</target>
+      </trans-unit>
+      <trans-unit id="65">
+        <source>Où suis-je?</source>
+        <target>Where am I?</target>
+      </trans-unit>
+      <trans-unit id="66">
+        <source>Programmation</source>
+        <target>Schedule</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

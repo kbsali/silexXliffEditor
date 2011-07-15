@@ -1,5 +1,5 @@
 <?php
-$dir = __DIR__.'/../../xliff-editor-test/';
+$dir = __DIR__.'/../tests/xliff';
 
 $app->get('/', function() use($app, $dir) {
     $basedir = helper::getBaseDir($dir);
