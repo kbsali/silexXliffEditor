@@ -1,4 +1,10 @@
 <?php
+function isLoggedIn($app) {
+    if(null === $user = $app['session']->get('user')) {
+        return $app->redirect('/login');
+    }
+    return $user;
+}
 class xliff {
   public static function parse($f) {
     if(!file_exists($f)) {

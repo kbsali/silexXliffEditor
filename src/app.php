@@ -1,14 +1,39 @@
 <?php
+use Symfony\Component\HttpFoundation\Response;
+
 $dir = __DIR__.'/../tests/xliff';
 
+
+$app->get('/login', function() use($app, $dir) {
+    $username = $app['request']->server->get('PHP_AUTH_USER', false);
+    $password = $app['request']->server->get('PHP_AUTH_PW');
+
+    if('admin' === $username && 'password' === $password) {
+        $app['session']->set('user', array('username' => $username));
+        return $app->redirect('/');
+    }
+    $response = new Response();
+    $response->headers->set('WWW-Authenticate', sprintf('Basic realm="%s"', 'site_login'));
+    $response->setStatusCode(401, 'Please sign in.');
+    return $response;
+});
+
 $app->get('/', function() use($app, $dir) {
+    if(null === $user = $app['session']->get('user')) {
+        return $app->redirect('/login');
+    }
+
     $basedir = helper::getBaseDir($dir);
-    $files = helper::rglob('*', $basedir);
+    $files = helper::rglob('*.{xliff,xml}', $basedir, GLOB_BRACE);
     $fileNames = helper::getFileNames($files, $basedir);
-    return $app->redirect('/edit/'.$fileNames[0]);
+    return $app->redirect('/edit'.$fileNames[0]);
 });
 
 $app->get('/permission/{fileName}', function($fileName) use($app, $dir) {
+    if(null === $user = $app['session']->get('user')) {
+        return $app->redirect('/login');
+    }
+
     $basedir = helper::getBaseDir($dir);
     $f = $basedir.'/'.$fileName;
     helper::fixPerms($f);
@@ -17,6 +42,10 @@ $app->get('/permission/{fileName}', function($fileName) use($app, $dir) {
 });
 
 $app->get('/reindex/{fileName}', function($fileName) use($app, $dir) {
+    if(null === $user = $app['session']->get('user')) {
+        return $app->redirect('/login');
+    }
+
     $basedir = helper::getBaseDir($dir);
     $f = $basedir.'/'.$fileName;
     $msg = helper::fixIds($f) ? 'IDs re-indexed' : 'ERROR writing to file';
@@ -25,6 +54,10 @@ $app->get('/reindex/{fileName}', function($fileName) use($app, $dir) {
 });
 
 $app->post('/update/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
+    if(null === $user = $app['session']->get('user')) {
+        return $app->redirect('/login');
+    }
+
     $request = $app['request'];
 
     $basedir = helper::getBaseDir($dir);
@@ -45,6 +78,10 @@ $app->post('/update/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
 });
 
 $app->get('/delete/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
+    if(null === $user = $app['session']->get('user')) {
+        return $app->redirect('/login');
+    }
+
     $basedir = helper::getBaseDir($dir);
     $f = $basedir.'/'.$fileName;
     try {
@@ -58,18 +95,21 @@ $app->get('/delete/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
 });
 
 $app->get('/edit/{fileName}', function($fileName) use($app, $dir) {
+    if(null === $user = $app['session']->get('user')) {
+        return $app->redirect('/login');
+    }
+
     $request = $app['request'];
 
     $basedir = helper::getBaseDir($dir);
     $f = $basedir.'/'.$fileName;
 
-    $files = helper::rglob('*.xml', $basedir);
+    $files = helper::rglob('*.{xliff,xml}', $basedir, GLOB_BRACE);
     $fileNames = helper::getFileNames($files, $basedir);
 
     try {
         $oXml = xliff::parse($f);
         $x = '/xliff/file/body/trans-unit';
-
         if(!is_null($request->get('empty'))) {
             $x.= "/target[. = '']";
         }
