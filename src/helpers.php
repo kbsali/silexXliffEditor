@@ -6,7 +6,8 @@ class xliff {
     }
     try {
       libxml_use_internal_errors(true);
-      $oXml = simplexml_load_string(file_get_contents($f));
+      // SimpleXML has issues with Namespaces...
+      $oXml = simplexml_load_string( str_replace('xmlns=', 'ns=', file_get_contents($f)) );
       if(!$oXml) {
         $errs = libxml_get_errors();
         $strErr = '';
@@ -207,12 +208,13 @@ class helper {
    * - it also append "(ro)" to read-only files
    * @param array $arr
    * @param string $basedir
+   * @param boolean $verbose - if true will append (ro) to read-only files
    * @return array
    */
-  public static function getFileNames(Array $arr = array(), $basedir) {
+  public static function getFileNames(Array $arr = array(), $basedir, $verbose = false) {
     $ret = array();
     foreach($arr as $f) {
-      if(!is_writable($f)) {
+      if(true === $verbose && !is_writable($f)) {
         $f.= ' (ro)';
       }
       $ret[] = str_replace($basedir, '', $f);
@@ -256,4 +258,48 @@ class helper {
       die('IDs re-indexed. <a href="?f=' . $idx . '">back</a>');
     }
   }
+}
+function dump() {
+    $args = func_get_args();
+    $backtrace = debug_backtrace();
+    $code = file($backtrace[0]['file']);
+
+    echo '<pre style="background: #eee;border: 1px solid #aaa;clear: both;overflow: auto;padding: 10px;text-align: left;margin-bottom: 5px">';
+    echo '<b>' . $backtrace[0]['file'] . '</b>::<b>' . $backtrace[0]['line'] . '</b><br/><br/>';
+    echo '<b>' . htmlspecialchars(trim($code[$backtrace[0]['line'] - 1])) . '</b>' . PHP_EOL;
+    echo PHP_EOL;
+
+    ob_start();
+    foreach($args as $arg){
+        var_dump($arg);
+    }
+    $str = ob_get_contents();
+    ob_end_clean();
+
+    $str = preg_replace('/=>(\s+)/', ' => ', $str);
+    $str = preg_replace('/ => NULL/', ' &rarr; <b style="color: #000">NULL</b>', $str);
+    $str = preg_replace('/}\n(\s+)\[/', "}\n\n" . '$1[', $str);
+
+    $str = preg_replace('/ (float|int)\((\-?[\d\.]+)\)/', ' <span style="color: #888">$1</span> <b style="color: brown">$2</b>', $str);
+
+    $str = preg_replace('/array\((\d+)\) {\s+}\n/', '<span style="color: #888">array&bull;$1</span> <b style="color: brown">[]</b>', $str);
+    $str = preg_replace('/ string\((\d+)\) \"(.*)\"/', ' <span style="color: #888">str&bull;$1</span> <b style="color: brown">\'$2\'</b>', $str);
+
+    $str = preg_replace('/\[\"(.+)\"\] => /', '<span style="color: purple">\'$1\'</span> &rarr; ', $str);
+
+    $str = preg_replace('/object\((\S+)\)#(\d+) \((\d+)\) {/', '<span style="color: #888">obj&bull;$2</span> <b style="color: #0C9136">$1[$3]</b> {', $str);
+
+    $str = str_replace("bool(false)", '<span style="color: #888">bool&bull;</span><span style="color: red">false</span>', $str);
+    $str = str_replace("bool(true)", '<span style="color: #888">bool&bull;</span><span style="color: green">true</span>', $str);
+
+    echo $str;
+
+    echo 'Sizes: ';
+    foreach($args as $k => $arg) {
+        if($k > 0) {
+            echo ', ';
+        }
+        echo count($arg);
+    }
+    echo '</pre>';
 }
