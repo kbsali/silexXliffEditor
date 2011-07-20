@@ -3,6 +3,9 @@ td.trans {width: 50%;}
 textarea {width: 99%;}
 .c {text-align: center;}
 
+th, td.editableMulti {cursor: pointer;}
+td.target {white-space: pre;}
+
 td.idx {white-space: nowrap;}
 
 #hinfo {position: fixed;top: 100px;right: 0;text-align: center;vertical-align: middle;}
