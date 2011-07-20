@@ -26,7 +26,7 @@ $app->get('/', function() use($app, $dir) {
     $basedir = helper::getBaseDir($dir);
     $files = helper::rglob('*.{xliff,xml}', $basedir, GLOB_BRACE);
     $fileNames = helper::getFileNames($files, $basedir);
-    return $app->redirect('/edit'.$fileNames[0]);
+    return $app->redirect('/edit'.key($fileNames));
 });
 
 $app->get('/permission/{fileName}', function($fileName) use($app, $dir) {
@@ -110,13 +110,14 @@ $app->get('/edit/{fileName}', function($fileName) use($app, $dir) {
     try {
         $oXml = xliff::parse($f);
         $x = '/xliff/file/body/trans-unit';
-        if(!is_null($request->get('empty'))) {
+        if( 1 == $request->get('empty', 0) ) {
             $x.= "/target[. = '']";
         }
 
         $dups = array();
-        if(!is_null($request->get('duplicate'))) {
+        if( 1 == $request->get('duplicate', 0) ) {
             $dups = xliff::getDuplicates($oXml);
+            $xpath = array();
             foreach($dups as $id => $bla) {
                 $xpath[] = '@id="' . $id . '"';
             }
@@ -125,9 +126,14 @@ $app->get('/edit/{fileName}', function($fileName) use($app, $dir) {
 
         $langSource = $oXml->file['source-language'];
         $langTarget = $oXml->file['target-language'];
-        foreach($oXml->xpath($x) as $ts) {
-            $ts->id = $ts['id'];
-            $arr[] = $ts;
+
+        $aXml = $oXml->xpath($x);
+        $arr = array();
+        if(false !== $aXml) {
+            foreach($aXml as $ts) {
+                $ts->id = $ts['id'];
+                $arr[] = $ts;
+            }
         }
     } catch (Exception $e) {
         throw new Exception('Problem parsing xml : ' . $e->getMessage());
@@ -145,10 +151,11 @@ $app->get('/edit/{fileName}', function($fileName) use($app, $dir) {
         'dateExtract' => (string)$oXml->file['date'],
         'dateSave' => filemtime($f),
 
-        'noDuplicate' => !is_null($request->get('duplicate')) && empty($dups),
+        'noDuplicate' => 1 == $request->get('duplicate', 0) && empty($arr),
+        'noEmpty' => 1 == $request->get('empty', 0) && empty($arr),
 
         'selectFiles' => html::dropdown('f', $fileNames, $fileName),
-        'selectShowEmpty' => html::dropdown('empty', array(0 => 'No', 1 => 'Yes'), !is_null($request->get('empty'))),
-        'selectShowDuplicate' => html::dropdown('duplicate', array(0 => 'No', 1 => 'Yes'), !is_null($request->get('duplicate')) && !empty($dups)),
+        'selectShowEmpty' => html::dropdown('empty', array(0 => 'No', 1 => 'Yes'), $request->get('empty', 0) ),
+        'selectShowDuplicate' => html::dropdown('duplicate', array(0 => 'No', 1 => 'Yes'), $request->get('duplicate', 0) ),
     ));
 });

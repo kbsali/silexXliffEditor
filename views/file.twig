@@ -4,9 +4,7 @@
 <script type="text/javascript">
 $(function(){
   $.inlineEdit({
-    //target: '?type=target&f={{ fileName }}&id=',
     target: '/update/{{ fileName }}/',
-    //remove: '?remove&type=target&f={{ fileName }}&id='
     remove: '/delete/{{ fileName }}/'
   }, {
     animate: false,
@@ -18,11 +16,9 @@ $(function(){
 $(document).ready(function(){
 
   // sort columns!
-  var th = jQuery('th'),
-    inverse = false;
+  var th = jQuery('th'), inverse = false;
   th.click(function(){
-    var header = $(this),
-        index = header.index();
+    var header = $(this), index = header.index();
     header
       .closest('table')
       .find('td')
@@ -43,83 +39,86 @@ $(document).ready(function(){
       });
     inverse = !inverse;
   });
-
-  if(typeof $(".source > textarea")!="undefined") {
+  // Autogrow if in edit mode
+  if($("#data td").size()>0 && typeof $(".source > textarea")!="undefined") {
     $(".source > textarea").width( $(".source").width() ).attr("readonly", "readonly");
     $(".editableMulti").click(function(){
       var o = $(this).find("textarea");
       o.width($(this).width()).autogrow();
     });
-    $('#f, #show_empty, #show_dup').change(function(){
-      window.location = '?f=' + $('#f').val() + '&show_empty=' + $('#show_empty').val() + '&show_dup=' + $('#show_dup').val();
-    });
-    //----------------------------------------------------------------------------
-    $(window).jkey('shift+ctrl+g', function(){
-      var trid = $('.editFieldWrapper').parent().parent().attr('id');
-      var from = $('#'+trid+' td.source textarea').val();
-      $.translate(from, '{{ langSource }}', '{{ langTarget }}', {
-        complete: function(translation){
-          $('.editFieldWrapper textarea.editField').val(translation);
-        }
-      });
-    })
-    $(window).jkey('esc',function(){
-      $('.editFieldCancel').click();
-    });
-    $(window).jkey('ctrl+m',function(){
-      $('#hinfo').click();
-    });
-    $(window).jkey('ctrl+e',function(){
-      var newVal = $('#show_empty').val()==0 ? 1 : 0;
-      window.location = '?f=' + $('#f').val() + '&show_empty=' + newVal;
-    });
-    $(window).jkey('ctrl+d',function(){
-      var newVal = $('#show_dup').val()==0 ? 1 : 0;
-      window.location = '?f=' + $('#f').val() + '&show_dup=' + newVal;
-    });
-    $(window).jkey('shift+ctrl+down', function(){
-      move('next', true);
-    });
-    $(window).jkey('ctrl+down', function(){
-      move('next', false);
-    });
-    $(window).jkey('shift+ctrl+up', function(){
-      move('prev', true);
-    });
-    $(window).jkey('ctrl+up', function(){
-      move('prev', false);
-    });
-    //----------------------------------------------------------------------------
-    $('#hinfo').click(function(){
-      $('#info').modal();
-      return false;
-    });
-    var move = function(prevNext, save){
-      var tr = $('.editFieldWrapper').parent().parent();
-      // do we want to up or down?
-      if(prevNext == 'next') {
-        var ntr = $('.editFieldWrapper').parent().parent().next();
-      } else {
-        var ntr = $('.editFieldWrapper').parent().parent().prev();
-      }
-      ed(tr, ntr, save);
-    };
-    var ed = function(tr, ntr, save){
-      if(ntr!=null) {
-        if(save==true) {
-          $('.editFieldSaveControllers button').click();
-        } else {
-          $('.editFieldCancel').click();
-        }
-        $('#id'+ntr.attr('id')).click();
-      }
-    };
   }
+  $('#f, #empty, #duplicate').change(function(){
+    window.location = '/edit/' + $('#f').val() + '?empty=' + $('#empty').val() + '&duplicate=' + $('#duplicate').val();
+  });
+  //----------------------------------------------------------------------------
+  $(window).jkey('shift+ctrl+g', function(){
+    var trid = $('.editFieldWrapper').parent().parent().attr('id');
+    var from = $('#'+trid+' td.source textarea').val();
+    $.translate(from, '{{ langSource }}', '{{ langTarget }}', {
+      complete: function(translation){
+        $('.editFieldWrapper textarea.editField').val(translation);
+      }
+    });
+  })
+  $(window).jkey('esc',function(){
+    $('.editFieldCancel').click();
+  });
+  $(window).jkey('ctrl+m',function(){
+    $('#hinfo').click();
+  });
+  $(window).jkey('ctrl+e',function(){
+    var newVal = $('#empty').val()==0 ? 1 : 0;
+    window.location = '?f=' + $('#f').val() + '&empty=' + newVal;
+  });
+  $(window).jkey('ctrl+d',function(){
+    var newVal = $('#duplicate').val()==0 ? 1 : 0;
+    window.location = '?f=' + $('#f').val() + '&duplicate=' + newVal;
+  });
+  $(window).jkey('shift+ctrl+down', function(){
+    move('next', true);
+  });
+  $(window).jkey('ctrl+down', function(){
+    move('next', false);
+  });
+  $(window).jkey('shift+ctrl+up', function(){
+    move('prev', true);
+  });
+  $(window).jkey('ctrl+up', function(){
+    move('prev', false);
+  });
+  //----------------------------------------------------------------------------
+  $('#hinfo').click(function(){
+    $('#info').modal();
+    return false;
+  });
+  var move = function(prevNext, save){
+    var tr = $('.editFieldWrapper').parent().parent();
+    // do we want to up or down?
+    if(prevNext == 'next') {
+      var ntr = $('.editFieldWrapper').parent().parent().next();
+    } else {
+      var ntr = $('.editFieldWrapper').parent().parent().prev();
+    }
+    ed(tr, ntr, save);
+  };
+  var ed = function(tr, ntr, save){
+    if(ntr!=null) {
+      if(save==true) {
+        $('.editFieldSaveControllers button').click();
+      } else {
+        $('.editFieldCancel').click();
+      }
+      $('#id'+ntr.attr('id')).click();
+    }
+  };
 });
 </script>
 </head>
 <body>
 
+{% if noEmpty %}
+<div class="notice c">No empty strings</div>
+{% endif %}
 {% if noDuplicate %}
 <div class="notice c">No duplicates</div>
 {% endif %}

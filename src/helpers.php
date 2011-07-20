@@ -141,7 +141,6 @@ class html {
       $options = array(0 => $nullLabel) + $options;
     }
     $ret = '<select class="ui-corner-all" name="' . $name . '" id="' . $name . '">' . PHP_EOL;
-    $selected = $selected;
     foreach ($options as $key => $option) {
       $select = $selected == $key ? ' selected="selected"' : '';
       $ret.= '<option value="' . $key . '"' . $select . '>' . $option . '</option>' . PHP_EOL;
@@ -223,7 +222,7 @@ class helper {
       if(true === $verbose && !is_writable($f)) {
         $f.= ' (ro)';
       }
-      $ret[] = str_replace($basedir, '', $f);
+      $ret[str_replace($basedir . '/', '', $f)] = str_replace($basedir, '', $f);
     }
     return $ret;
   }
