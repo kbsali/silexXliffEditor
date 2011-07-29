@@ -1,11 +1,12 @@
 {% extends "layout.twig" %}
 
-{% block content %}
+{% block head %}
+{{ parent() }}
 <script type="text/javascript">
 $(function(){
   $.inlineEdit({
-    target: '/update/{{ fileName }}/',
-    remove: '/delete/{{ fileName }}/'
+    target: '/update/translation/{{ fileName }}/',
+    comment: '/update/comment/{{ fileName }}/'
   }, {
     animate: false,
     filterElementValue: function($o) {
@@ -113,15 +114,9 @@ $(document).ready(function(){
   };
 });
 </script>
-</head>
-<body>
+{% endblock %}
 
-{% if noEmpty %}
-<div class="notice c">No empty strings</div>
-{% endif %}
-{% if noDuplicate %}
-<div class="notice c">No duplicates</div>
-{% endif %}
+{% block content %}
 <span id="hinfo" class="{{ isWritable ? 'success' : 'error' }}"><a href="#info">Menu</a><br/>{{ langSource }} -> {{ langTarget }}</span>
 <div id="info" style="display:none;">
   <ul>
@@ -152,12 +147,20 @@ $(document).ready(function(){
   </ul>
 </div>
 
+{% if noEmpty %}
+<div class="notice c">No empty strings</div>
+{% endif %}
+{% if noDuplicate %}
+<div class="notice c">No duplicates</div>
+{% endif %}
+
 <table id="data">
 <thead>
 <tr>
     <th>ID</th>
     <th id="source">Source</th>
     <th id="target">Target</th>
+    <th id="comment">Comment</th>
 </tr>
 </thead>
 <tbody>
@@ -165,9 +168,10 @@ $(document).ready(function(){
 {% for k, ts in oXml %}
 {% set del = '<a href="/delete/' ~ fileName ~ "/" ~ ts.id ~ '">X</a>' %}
 <tr id="{{ ts.id }}" {{ k is odd ? 'class="info"' : "" }}>
-    <td class="r idx">{{ isWritable ? del|raw : "" }} {{ ts.id }}</td>
+    <td class="r idx">{{ isWritable and canDelete ? del|raw : "" }} {{ ts.id }}</td>
     <td class="trans source"><textarea>{{ ts.source is empty ? "&nbsp;" : ts.source }}</textarea></td>
-    <td id="id{{ ts.id }}" class="trans target id{{ ts.id }}{{ isWritable ? " editableMulti" : "" }}">{{ ts.target is empty ? "&nbsp;" : ts.target }}</td>
+    <td id="id{{ ts.id }}" class="trans target id{{ ts.id }}{{ isWritable ? " editableMulti" : "" }}">{{ ts.target is empty ? "&nbsp;" : ts.target -}}</td>
+    <td id="cid{{ ts.id }}" class="trans comment id{{ ts.id }}{{ isWritable ? " editableMulti" : "" }}">{{ ts.comment is empty ? "&nbsp;" : ts.comment -}}</td>
 </tr>
 {% endfor %}
 

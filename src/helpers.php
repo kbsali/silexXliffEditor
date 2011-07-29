@@ -48,9 +48,22 @@ class xliff {
    * @param string $data
    * @return SimpleXML $oXml
    */
-  public static function updateId(SimpleXMLElement $oXml, $id, $data) {
+  public static function updateTranslationId(SimpleXMLElement $oXml, $id, $data) {
     $o = $oXml->xpath('/xliff/file/body/trans-unit[@id="'.$id.'"]');
     $o[0]->target = str_replace('\\', '', trim($data));
+    $dom = dom_import_simplexml($o[0]);
+    return $oXml;
+  }
+  /**
+   * Updates comment attribute given the id of the node + its new value
+   * @param type $oXml
+   * @param int $id
+   * @param string $data
+   * @return SimpleXML $oXml
+   */
+  public static function updateCommentId(SimpleXMLElement $oXml, $id, $data) {
+    $o = $oXml->xpath('/xliff/file/body/trans-unit[@id="'.$id.'"]');
+    $o[0]['comment'] = str_replace('\\', '', trim($data));
     $dom = dom_import_simplexml($o[0]);
     return $oXml;
   }

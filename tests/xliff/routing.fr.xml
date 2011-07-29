@@ -15,7 +15,7 @@
         <source>Wall</source>
         <target>asdf</target>
       </trans-unit>
-      <trans-unit id="5">
+      <trans-unit id="5" comment="some random comment...">
         <source>Programme</source>
         <target>Program </target>
       </trans-unit>

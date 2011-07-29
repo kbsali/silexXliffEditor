@@ -4,12 +4,24 @@ use Symfony\Component\HttpFoundation\Response;
 $dir = __DIR__.'/../tests/xliff';
 
 
+$app->get('/logout', function() use($app) {
+    $app['session']->invalidate();
+    return $app->redirect('/login');
+});
+
 $app->get('/login', function() use($app, $dir) {
+    /*
+    dump($app['session']);
+    dump($app['request']->server);die;
+    */
     $username = $app['request']->server->get('PHP_AUTH_USER', false);
     $password = $app['request']->server->get('PHP_AUTH_PW');
 
     if('admin' === $username && 'password' === $password) {
-        $app['session']->set('user', array('username' => $username));
+        $app['session']->set('user', array('username' => $username, 'level' => 'god'));
+        return $app->redirect('/');
+    } elseif('translator' === $username && 'password' === $password) {
+        $app['session']->set('user', array('username' => $username, 'level' => 'translator'));
         return $app->redirect('/');
     }
     $response = new Response();
@@ -26,7 +38,7 @@ $app->get('/', function() use($app, $dir) {
     $basedir = helper::getBaseDir($dir);
     $files = helper::rglob('*.{xliff,xml}', $basedir, GLOB_BRACE);
     $fileNames = helper::getFileNames($files, $basedir);
-    return $app->redirect('/edit'.key($fileNames));
+    return $app->redirect('/edit/'.key($fileNames));
 });
 
 $app->get('/permission/{fileName}', function($fileName) use($app, $dir) {
@@ -53,7 +65,7 @@ $app->get('/reindex/{fileName}', function($fileName) use($app, $dir) {
     return $app->redirect('/edit/'.$fileName);
 });
 
-$app->post('/update/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
+$app->post('/update/{what}/{fileName}/{id}', function($what, $fileName, $id) use($app, $dir) {
     if(null === $user = $app['session']->get('user')) {
         return $app->redirect('/login');
     }
@@ -71,7 +83,11 @@ $app->post('/update/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
     if(empty($data)) {
         return new Response('A');
     }
-    $oXml = xliff::updateId($oXml, $id, $data);
+    if($what == 'translation') {
+        $oXml = xliff::updateTranslationId($oXml, $id, $data);
+    } elseif($what == 'comment') {
+        $oXml = xliff::updateCommentId($oXml, $id, $data);
+    }
     $msg = file_put_contents($f, i18n::saveXml($oXml)) ? 'File saved ok' : 'ERROR writing to file';
     return new Response($msg);
     //var_export(get_class_methods(get_class($app)));
@@ -80,6 +96,9 @@ $app->post('/update/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
 $app->get('/delete/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
     if(null === $user = $app['session']->get('user')) {
         return $app->redirect('/login');
+    }
+    if('god' != $user['level']) {
+        throw new Exception('You are not allowed to delete elements!');
     }
 
     $basedir = helper::getBaseDir($dir);
@@ -132,6 +151,7 @@ $app->get('/edit/{fileName}', function($fileName) use($app, $dir) {
         if(false !== $aXml) {
             foreach($aXml as $ts) {
                 $ts->id = $ts['id'];
+                $ts->comment = $ts['comment'];
                 $arr[] = $ts;
             }
         }
@@ -141,6 +161,8 @@ $app->get('/edit/{fileName}', function($fileName) use($app, $dir) {
     return $app['twig']->render('file.twig', array(
         'oXml' => $arr,
         'isWritable' => is_writable($f),
+
+        'canDelete' => 'god' === $user['level'],
 
         'baseDir' => $basedir,
         'fileName' => $fileName,

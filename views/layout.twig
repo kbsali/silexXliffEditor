@@ -1,7 +1,8 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-  {% block head %}
+{% block head %}
+    <meta charset="utf-8">
     <title>{% block title %}Xliff editor{% endblock %}</title>
     <link rel="stylesheet" href="/css/screen.css" />
     <link rel="stylesheet" href="/css/main.css" />
@@ -13,9 +14,10 @@
     <script src="/js/jquery.simplemodal.1.4.1.min.js"></script>
     <script src="/js/jquery.translate-1.4.1.min.js"></script>
     <script src="/js/jquery.sort.js"></script>
-  {% endblock %}
+{% endblock %}
 </head>
 <body>
-    {% block content %}{% endblock %}
+    {% block content %}
+    {% endblock %}
 </body>
 </html>
