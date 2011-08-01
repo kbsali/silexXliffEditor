@@ -1,5 +1,5 @@
 tr:hover {background-color: #e6efc2 !important;border-color:#c6d880;}
-th#target, th#comment {width: 33%;}
+th#source, th#target, th#comment {width: 33%;}
 th#source, th#target, th#comment, td.source, td.target, td.comment {border-left: 1px solid #000;vertical-align: top;}
 textarea {width: 99%;height: 30px;}
 .c {text-align: center;}
