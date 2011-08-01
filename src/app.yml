@@ -5,3 +5,8 @@ users:
     translator:
         password: password
         group: translator
+base_dir:
+    -
+        <?php echo __DIR__ ?>/../tests/xliff
+    -
+        <?php echo __DIR__ ?>/../tests/xliff2

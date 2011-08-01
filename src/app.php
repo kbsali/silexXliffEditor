@@ -5,8 +5,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-$dir = __DIR__.'/../tests/xliff';
-
 function protect($app) {
     if($app['request']->get('require_authentication')) {
         if(null === $user = $app['session']->get('user')) {
@@ -25,7 +23,7 @@ $app->get('/logout', function() use($app) {
     return $app->redirect('/login');
 });
 
-$app->get('/login', function() use($app, $dir) {
+$app->get('/login', function() use($app) {
     $username = $app['request']->server->get('PHP_AUTH_USER', false);
     $password = $app['request']->server->get('PHP_AUTH_PW');
 
@@ -39,36 +37,36 @@ $app->get('/login', function() use($app, $dir) {
     return $response;
 });
 
-$app->get('/', function() use($app, $dir) {
+$app->get('/', function() use($app) {
     protect($app);
-    $basedir = helper::getBaseDir($dir);
+    $basedir = helper::getBaseDir($app['base_dir'][0]);
     $files = helper::rglob('*.{xliff,xml}', $basedir, GLOB_BRACE);
     $fileNames = helper::getFileNames($files, $basedir);
     return $app->redirect('/edit/'.key($fileNames));
 })->value('require_authentication', true);
 
-$app->get('/permission/{fileName}', function($fileName) use($app, $dir) {
+$app->get('/permission/{fileName}', function($fileName) use($app) {
     protect($app);
-    $basedir = helper::getBaseDir($dir);
+    $basedir = helper::getBaseDir($app['base_dir'][0]);
     $f = $basedir.'/'.$fileName;
     helper::fixPerms($f);
     $msg = helper::fixIds($f) ? 'Impossible to change file\'s permissions' : 'File\'s permissions successfully updated';
     return $app->redirect('/edit/'.$fileName);
 })->value('require_authentication', true);
 
-$app->get('/reindex/{fileName}', function($fileName) use($app, $dir) {
+$app->get('/reindex/{fileName}', function($fileName) use($app) {
     protect($app);
-    $basedir = helper::getBaseDir($dir);
+    $basedir = helper::getBaseDir($app['base_dir'][0]);
     $f = $basedir.'/'.$fileName;
     $msg = helper::fixIds($f) ? 'IDs re-indexed' : 'ERROR writing to file';
     return $app->redirect('/edit/'.$fileName);
 })->value('require_authentication', true);
 
-$app->post('/update/{what}/{fileName}/{id}', function($what, $fileName, $id) use($app, $dir) {
+$app->post('/update/{what}/{fileName}/{id}', function($what, $fileName, $id) use($app) {
     protect($app);
     $request = $app['request'];
 
-    $basedir = helper::getBaseDir($dir);
+    $basedir = helper::getBaseDir($app['base_dir'][0]);
     $f = $basedir.'/'.$fileName;
     try {
         $oXml = xliff::parse($f);
@@ -88,13 +86,13 @@ $app->post('/update/{what}/{fileName}/{id}', function($what, $fileName, $id) use
     return new Response($msg);
 })->value('require_authentication', true);
 
-$app->get('/delete/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
+$app->get('/delete/{fileName}/{id}', function($fileName, $id) use($app) {
     protect($app);
     $user = $app['session']->get('user');
     if('god' != $user['group']) {
         throw new Exception('You are not allowed to delete elements!');
     }
-    $basedir = helper::getBaseDir($dir);
+    $basedir = helper::getBaseDir($app['base_dir'][0]);
     $f = $basedir.'/'.$fileName;
     try {
         $oXml = xliff::parse($f);
@@ -106,12 +104,12 @@ $app->get('/delete/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
     return $app->redirect('/edit/'.$fileName);
 })->value('require_authentication', true);
 
-$app->get('/edit/{fileName}', function($fileName) use($app, $dir) {
+$app->get('/edit/{fileName}', function($fileName) use($app) {
     protect($app);
     $user = $app['session']->get('user');
     $request = $app['request'];
 
-    $basedir = helper::getBaseDir($dir);
+    $basedir = helper::getBaseDir($app['base_dir'][0]);
     $f = $basedir.'/'.$fileName;
 
     $files = helper::rglob('*.{xliff,xml}', $basedir, GLOB_BRACE);
