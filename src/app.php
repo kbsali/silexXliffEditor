@@ -1,8 +1,24 @@
 <?php
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 $dir = __DIR__.'/../tests/xliff';
 
+function protect($app) {
+    if($app['request']->get('require_authentication')) {
+        if(null === $user = $app['session']->get('user')) {
+            throw new AccessDeniedHttpException('require auth...');
+        }
+    }
+}
+$app->before(function() use ($app) {
+    $arr = Yaml::parse(__DIR__.'/app.yml');
+    $app['users'] = $arr['users'];
+    $app['base_dir'] = $arr['base_dir'];
+});
 
 $app->get('/logout', function() use($app) {
     $app['session']->invalidate();
@@ -10,18 +26,11 @@ $app->get('/logout', function() use($app) {
 });
 
 $app->get('/login', function() use($app, $dir) {
-    /*
-    dump($app['session']);
-    dump($app['request']->server);die;
-    */
     $username = $app['request']->server->get('PHP_AUTH_USER', false);
     $password = $app['request']->server->get('PHP_AUTH_PW');
 
-    if('admin' === $username && 'password' === $password) {
-        $app['session']->set('user', array('username' => $username, 'level' => 'god'));
-        return $app->redirect('/');
-    } elseif('translator' === $username && 'password' === $password) {
-        $app['session']->set('user', array('username' => $username, 'level' => 'translator'));
+    if(isset($app['users'][$username]) && $app['users'][$username]['password'] === $password) {
+        $app['session']->set('user', array('username' => $username, 'group' => $app['users'][$username]['group']));
         return $app->redirect('/');
     }
     $response = new Response();
@@ -31,45 +40,32 @@ $app->get('/login', function() use($app, $dir) {
 });
 
 $app->get('/', function() use($app, $dir) {
-    if(null === $user = $app['session']->get('user')) {
-        return $app->redirect('/login');
-    }
-
+    protect($app);
     $basedir = helper::getBaseDir($dir);
     $files = helper::rglob('*.{xliff,xml}', $basedir, GLOB_BRACE);
     $fileNames = helper::getFileNames($files, $basedir);
     return $app->redirect('/edit/'.key($fileNames));
-});
+})->value('require_authentication', true);
 
 $app->get('/permission/{fileName}', function($fileName) use($app, $dir) {
-    if(null === $user = $app['session']->get('user')) {
-        return $app->redirect('/login');
-    }
-
+    protect($app);
     $basedir = helper::getBaseDir($dir);
     $f = $basedir.'/'.$fileName;
     helper::fixPerms($f);
     $msg = helper::fixIds($f) ? 'Impossible to change file\'s permissions' : 'File\'s permissions successfully updated';
     return $app->redirect('/edit/'.$fileName);
-});
+})->value('require_authentication', true);
 
 $app->get('/reindex/{fileName}', function($fileName) use($app, $dir) {
-    if(null === $user = $app['session']->get('user')) {
-        return $app->redirect('/login');
-    }
-
+    protect($app);
     $basedir = helper::getBaseDir($dir);
     $f = $basedir.'/'.$fileName;
     $msg = helper::fixIds($f) ? 'IDs re-indexed' : 'ERROR writing to file';
-    //return new Response($msg);
     return $app->redirect('/edit/'.$fileName);
-});
+})->value('require_authentication', true);
 
 $app->post('/update/{what}/{fileName}/{id}', function($what, $fileName, $id) use($app, $dir) {
-    if(null === $user = $app['session']->get('user')) {
-        return $app->redirect('/login');
-    }
-
+    protect($app);
     $request = $app['request'];
 
     $basedir = helper::getBaseDir($dir);
@@ -90,17 +86,14 @@ $app->post('/update/{what}/{fileName}/{id}', function($what, $fileName, $id) use
     }
     $msg = file_put_contents($f, i18n::saveXml($oXml)) ? 'File saved ok' : 'ERROR writing to file';
     return new Response($msg);
-    //var_export(get_class_methods(get_class($app)));
-});
+})->value('require_authentication', true);
 
 $app->get('/delete/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
-    if(null === $user = $app['session']->get('user')) {
-        return $app->redirect('/login');
-    }
-    if('god' != $user['level']) {
+    protect($app);
+    $user = $app['session']->get('user');
+    if('god' != $user['group']) {
         throw new Exception('You are not allowed to delete elements!');
     }
-
     $basedir = helper::getBaseDir($dir);
     $f = $basedir.'/'.$fileName;
     try {
@@ -111,13 +104,11 @@ $app->get('/delete/{fileName}/{id}', function($fileName, $id) use($app, $dir) {
     $oXml = xliff::removeId($oXml, $id);
     $msg = file_put_contents($f, i18n::saveXml($oXml)) ? 'File saved ok' : 'ERROR writing to file';
     return $app->redirect('/edit/'.$fileName);
-});
+})->value('require_authentication', true);
 
 $app->get('/edit/{fileName}', function($fileName) use($app, $dir) {
-    if(null === $user = $app['session']->get('user')) {
-        return $app->redirect('/login');
-    }
-
+    protect($app);
+    $user = $app['session']->get('user');
     $request = $app['request'];
 
     $basedir = helper::getBaseDir($dir);
@@ -162,7 +153,7 @@ $app->get('/edit/{fileName}', function($fileName) use($app, $dir) {
         'oXml' => $arr,
         'isWritable' => is_writable($f),
 
-        'canDelete' => 'god' === $user['level'],
+        'canDelete' => 'god' === $user['group'],
 
         'baseDir' => $basedir,
         'fileName' => $fileName,
@@ -180,4 +171,15 @@ $app->get('/edit/{fileName}', function($fileName) use($app, $dir) {
         'selectShowEmpty' => html::dropdown('empty', array(0 => 'No', 1 => 'Yes'), $request->get('empty', 0) ),
         'selectShowDuplicate' => html::dropdown('duplicate', array(0 => 'No', 1 => 'Yes'), $request->get('duplicate', 0) ),
     ));
+})->value('require_authentication', true);
+
+$app->error(function (\Exception $e) use ($app) {
+    if ($e instanceof NotFoundHttpException) {
+        return new Response('The requested page could not be found.', 404);
+    }
+    if ($e instanceof AccessDeniedHttpException) {
+        return $app->redirect('/login');
+    }
+    $code = ($e instanceof HttpException) ? $e->getStatusCode() : 500;
+    return new Response('We are sorry, but something went terribly wrong: ' . $e->getMessage(), $code);
 });
