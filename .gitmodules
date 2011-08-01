@@ -4,3 +4,9 @@
 [submodule "vendor/Symfony/Component/Yaml"]
 	path = vendor/Symfony/Component/Yaml
 	url = https://github.com/symfony/Yaml.git
+[submodule "web/js/jkey"]
+	path = web/js/jkey
+	url = https://github.com/OscarGodson/jKey.git
+[submodule "web/js/jquery.autogrow"]
+	path = web/js/jquery.autogrow
+	url = https://github.com/jerryluk/jquery.autogrow.git
