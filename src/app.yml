@@ -1,0 +1,7 @@
+users:
+    admin:
+        password: password
+        group: god
+    translator:
+        password: password
+        group: translator
