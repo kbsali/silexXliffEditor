@@ -10,6 +10,7 @@ Installation
 
 * Sample Apache Vhost
 
+
     <VirtualHost *:80>
        ServerName  silexXliffEditor.lan
        DocumentRoot "/PATH/TO/silexXliffEditor/web"
