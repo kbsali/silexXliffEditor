@@ -13,6 +13,9 @@ function protect($app) {
     }
 }
 $app->before(function() use ($app) {
+    if(!file_exists(__DIR__.'/app.yml')) {
+        throw new Exception('No app.yml found (cp '.__DIR__.'/app.yml.sample '.__DIR__.'/app.yml ?)');
+    }
     $arr = Yaml::parse(__DIR__.'/app.yml');
     $app['users'] = $arr['users'];
     $app['base_dir'] = $arr['base_dir'];
