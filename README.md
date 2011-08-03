@@ -1,7 +1,8 @@
 silexXliffEditor, a simple Silex based Xliff Editor
 ===================================================
 
-## Installation
+Installation
+------------
 
 * After cloning the repo you'll have to update the submodules
 
@@ -10,19 +11,22 @@ silexXliffEditor, a simple Silex based Xliff Editor
 * Sample Apache Vhost
 
     <VirtualHost *:80>
-      ServerName  silexXliffEditor.lan
-      DocumentRoot "/PATH/TO/silexXliffEditor/web"
-      DirectoryIndex index.php
-      <Directory "/PATH/TO/silexXliffEditor/web">
-        RewriteEngine On
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteRule ^(.*)$ index.php [QSA,L]
-      </Directory>
+       ServerName  silexXliffEditor.lan
+       DocumentRoot "/PATH/TO/silexXliffEditor/web"
+       DirectoryIndex index.php
+
+       <Directory "/PATH/TO/silexXliffEditor/web">
+           RewriteEngine On
+           RewriteCond %{REQUEST_FILENAME} !-f
+           RewriteRule ^(.*)$ index.php [QSA,L]
+       </Directory>
+
     </VirtualHost>
 
 * Update the src/app.yml to your needs (it's probably a good idea to add it to your .gitignore file)
 
-## JS Libraries used
+JS Libraries used
+-----------------
 
 * jquery.autogrow : https://github.com/jerryluk/jquery.autogrow.git
 * jquery.jkey.js : https://github.com/OscarGodson/jKey.git
@@ -30,7 +34,8 @@ silexXliffEditor, a simple Silex based Xliff Editor
 * jquery.sort.js : https://github.com/jamespadolsey/jQuery-Plugins
 * jquery.translate.js : http://code.google.com/p/jquery-translate
 
-## TODO
+TODO
+----
 
 * allow multiple directories in app.yml
 * implement/fix logout
