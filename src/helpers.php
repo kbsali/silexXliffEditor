@@ -239,6 +239,36 @@ class helper {
     }
     return $ret;
   }
+  public static function getXliffFiles($dir) {
+    $files = helper::rglob('*.{xliff,xml}', $dir, GLOB_BRACE);
+
+    $ret = array();
+    foreach($files as $f) {
+      $k = helper::encodeFileName(str_replace($dir . '/', '', $f));
+      $ret[$k] = array(
+        'name' => $f,
+        'basename' => str_replace($dir, '', $f),
+        'basename_verbos' => str_replace($dir, '', $f) . (!is_writable($f) ? ' (ro)' : ''),
+        'writable' => is_writable($f),
+      );
+    }
+    $ret['basedir'] = $dir;
+    return $ret;
+  }
+  public function getFileBaseNames($files) {
+    unset($files['basedir']);
+    $ret = array();
+    foreach($files as $k => $arr) {
+      $ret[$k] = $arr['basename_verbos'];
+    }
+    return $ret;
+  }
+  public function encodeFileName($f) {
+    return str_replace('/', '__', $f);
+  }
+  public function decodeFileName($f) {
+    return str_replace('__', '/', $f);
+  }
   /**
    * Tries to make given $f file writable
    * - $idx if used for linking back to the file

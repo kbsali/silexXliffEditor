@@ -42,16 +42,15 @@ $app->get('/login', function() use($app) {
 
 $app->get('/', function() use($app) {
     protect($app);
-    $basedir = helper::getBaseDir($app['base_dir'][0]);
-    $files = helper::rglob('*.{xliff,xml}', $basedir, GLOB_BRACE);
-    $fileNames = helper::getFileNames($files, $basedir);
-    return $app->redirect('/edit/'.key($fileNames));
+
+    $files = helper::getXliffFiles($app['base_dir'][0]);
+    return $app->redirect('/edit/'.key($files));
 })->value('require_authentication', true);
 
 $app->get('/permission/{fileName}', function($fileName) use($app) {
     protect($app);
-    $basedir = helper::getBaseDir($app['base_dir'][0]);
-    $f = $basedir.'/'.$fileName;
+
+    $f = $app['base_dir'][0].'/'.helper::decodeFileName($fileName);
     helper::fixPerms($f);
     $msg = helper::fixIds($f) ? 'Impossible to change file\'s permissions' : 'File\'s permissions successfully updated';
     return $app->redirect('/edit/'.$fileName);
@@ -59,8 +58,8 @@ $app->get('/permission/{fileName}', function($fileName) use($app) {
 
 $app->get('/reindex/{fileName}', function($fileName) use($app) {
     protect($app);
-    $basedir = helper::getBaseDir($app['base_dir'][0]);
-    $f = $basedir.'/'.$fileName;
+
+    $f = $app['base_dir'][0].'/'.helper::decodeFileName($fileName);
     $msg = helper::fixIds($f) ? 'IDs re-indexed' : 'ERROR writing to file';
     return $app->redirect('/edit/'.$fileName);
 })->value('require_authentication', true);
@@ -69,8 +68,7 @@ $app->post('/update/{what}/{fileName}/{id}', function($what, $fileName, $id) use
     protect($app);
     $request = $app['request'];
 
-    $basedir = helper::getBaseDir($app['base_dir'][0]);
-    $f = $basedir.'/'.$fileName;
+    $f = $app['base_dir'][0].'/'.helper::decodeFileName($fileName);
     try {
         $oXml = xliff::parse($f);
     } catch (Exception $e) {
@@ -95,8 +93,7 @@ $app->get('/delete/{fileName}/{id}', function($fileName, $id) use($app) {
     if('god' != $user['group']) {
         throw new Exception('You are not allowed to delete elements!');
     }
-    $basedir = helper::getBaseDir($app['base_dir'][0]);
-    $f = $basedir.'/'.$fileName;
+    $f = $app['base_dir'][0].'/'.helper::decodeFileName($fileName);
     try {
         $oXml = xliff::parse($f);
     } catch (Exception $e) {
@@ -112,11 +109,8 @@ $app->get('/edit/{fileName}', function($fileName) use($app) {
     $user = $app['session']->get('user');
     $request = $app['request'];
 
-    $basedir = helper::getBaseDir($app['base_dir'][0]);
-    $f = $basedir.'/'.$fileName;
-
-    $files = helper::rglob('*.{xliff,xml}', $basedir, GLOB_BRACE);
-    $fileNames = helper::getFileNames($files, $basedir);
+    $files = helper::getXliffFiles($app['base_dir'][0]);
+    $f = $app['base_dir'][0].'/'.helper::decodeFileName($fileName);
 
     try {
         $oXml = xliff::parse($f);
@@ -156,8 +150,8 @@ $app->get('/edit/{fileName}', function($fileName) use($app) {
 
         'canDelete' => 'god' === $user['group'],
 
-        'baseDir' => $basedir,
-        'fileName' => $fileName,
+        'baseDir' => $app['base_dir'][0],
+        'fileName' => helper::decodeFileName($fileName),
 
         'langSource' => (string)$oXml->file['source-language'],
         'langTarget' => (string)$oXml->file['target-language'],
@@ -168,7 +162,7 @@ $app->get('/edit/{fileName}', function($fileName) use($app) {
         'noDuplicate' => 1 == $request->get('duplicate', 0) && empty($arr),
         'noEmpty' => 1 == $request->get('empty', 0) && empty($arr),
 
-        'selectFiles' => html::dropdown('f', $fileNames, $fileName),
+        'selectFiles' => html::dropdown('f', helper::getFileBaseNames($files), $fileName),
         'selectShowEmpty' => html::dropdown('empty', array(0 => 'No', 1 => 'Yes'), $request->get('empty', 0) ),
         'selectShowDuplicate' => html::dropdown('duplicate', array(0 => 'No', 1 => 'Yes'), $request->get('duplicate', 0) ),
     ));
