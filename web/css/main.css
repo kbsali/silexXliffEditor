@@ -5,7 +5,7 @@ textarea {width: 99%;height: 30px;}
 .c {text-align: center;}
 
 th, td.editableMulti {cursor: pointer;}
-td.target {white-space: pre;}
+td.target {white-space: pre-line;}
 
 td.idx {white-space: nowrap;}
 
