@@ -1,9 +1,11 @@
 <?php
-function isLoggedIn($app) {
-    if(null === $user = $app['session']->get('user')) {
-        return $app->redirect('/login');
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+function protect($app) {
+    if($app['request']->get('require_authentication')) {
+        if(null === $user = $app['session']->get('user')) {
+            throw new AccessDeniedHttpException('require auth...');
+        }
     }
-    return $user;
 }
 class xliff {
   public static function parse($f) {
