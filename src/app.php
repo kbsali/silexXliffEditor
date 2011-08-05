@@ -5,20 +5,31 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-function protect($app) {
-    if($app['request']->get('require_authentication')) {
-        if(null === $user = $app['session']->get('user')) {
-            throw new AccessDeniedHttpException('require auth...');
-        }
-    }
-}
 $app->before(function() use ($app) {
+    $app['session']->save();
+
+    // Load app settings
     if(!file_exists(__DIR__.'/app.yml')) {
         throw new Exception('No app.yml found (cp '.__DIR__.'/app.yml.sample '.__DIR__.'/app.yml ?)');
     }
     $arr = Yaml::parse(__DIR__.'/app.yml');
     $app['users'] = $arr['users'];
     $app['base_dir'] = $arr['base_dir'];
+
+    // Protect route if needed
+    if($app['request']->get('require_authentication')) {
+        if(null === $user = $app['session']->get('user')) {
+            throw new AccessDeniedHttpException('Authorization required');
+        }
+    }
+    /*
+    // Check group level
+    if($group = $app['request']->get('group')) {
+        if($group != $user['group']) {
+            throw new AccessDeniedHttpException('Group not granted');
+        }
+    }
+    */
 });
 
 $app->get('/logout', function() use($app) {
@@ -41,31 +52,27 @@ $app->get('/login', function() use($app) {
 });
 
 $app->get('/', function() use($app) {
-    protect($app);
-
     $files = helper::getXliffFiles($app['base_dir'][0]);
     return $app->redirect('/edit/'.key($files));
-})->value('require_authentication', true);
+})->value('require_authentication', true)
+;
 
 $app->get('/permission/{fileName}', function($fileName) use($app) {
-    protect($app);
-
     $f = $app['base_dir'][0].'/'.helper::decodeFileName($fileName);
     helper::fixPerms($f);
     $msg = helper::fixIds($f) ? 'Impossible to change file\'s permissions' : 'File\'s permissions successfully updated';
     return $app->redirect('/edit/'.$fileName);
-})->value('require_authentication', true);
+})->value('require_authentication', true)
+;
 
 $app->get('/reindex/{fileName}', function($fileName) use($app) {
-    protect($app);
-
     $f = $app['base_dir'][0].'/'.helper::decodeFileName($fileName);
     $msg = helper::fixIds($f) ? 'IDs re-indexed' : 'ERROR writing to file';
     return $app->redirect('/edit/'.$fileName);
-})->value('require_authentication', true);
+})->value('require_authentication', true)
+;
 
 $app->post('/update/{what}/{fileName}/{id}', function($what, $fileName, $id) use($app) {
-    protect($app);
     $request = $app['request'];
 
     $f = $app['base_dir'][0].'/'.helper::decodeFileName($fileName);
@@ -85,10 +92,10 @@ $app->post('/update/{what}/{fileName}/{id}', function($what, $fileName, $id) use
     }
     $msg = file_put_contents($f, i18n::saveXml($oXml)) ? 'File saved ok' : 'ERROR writing to file';
     return new Response($msg);
-})->value('require_authentication', true);
+})->value('require_authentication', true)
+;
 
 $app->get('/delete/{fileName}/{id}', function($fileName, $id) use($app) {
-    protect($app);
     $user = $app['session']->get('user');
     if('god' != $user['group']) {
         throw new Exception('You are not allowed to delete elements!');
@@ -102,10 +109,11 @@ $app->get('/delete/{fileName}/{id}', function($fileName, $id) use($app) {
     $oXml = xliff::removeId($oXml, $id);
     $msg = file_put_contents($f, i18n::saveXml($oXml)) ? 'File saved ok' : 'ERROR writing to file';
     return $app->redirect('/edit/'.$fileName);
-})->value('require_authentication', true);
+})->value('require_authentication', true)
+  ->value('group', 'god')
+;
 
 $app->get('/edit/{fileName}', function($fileName) use($app) {
-    protect($app);
     $user = $app['session']->get('user');
     $request = $app['request'];
 
@@ -166,13 +174,15 @@ $app->get('/edit/{fileName}', function($fileName) use($app) {
         'selectShowEmpty' => html::dropdown('empty', array(0 => 'No', 1 => 'Yes'), $request->get('empty', 0) ),
         'selectShowDuplicate' => html::dropdown('duplicate', array(0 => 'No', 1 => 'Yes'), $request->get('duplicate', 0) ),
     ));
-})->value('require_authentication', true);
+})->value('require_authentication', true)
+;
 
 $app->error(function (\Exception $e) use ($app) {
     if ($e instanceof NotFoundHttpException) {
         return new Response('The requested page could not be found.', 404);
     }
     if ($e instanceof AccessDeniedHttpException) {
+        $app['session']->invalidate();
         return $app->redirect('/login');
     }
     $code = ($e instanceof HttpException) ? $e->getStatusCode() : 500;

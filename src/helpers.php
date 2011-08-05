@@ -1,12 +1,4 @@
 <?php
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-function protect($app) {
-    if($app['request']->get('require_authentication')) {
-        if(null === $user = $app['session']->get('user')) {
-            throw new AccessDeniedHttpException('require auth...');
-        }
-    }
-}
 class xliff {
   public static function parse($f) {
     if(!file_exists($f)) {
