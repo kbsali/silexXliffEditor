@@ -159,7 +159,7 @@ $app->get('/edit/{fileName}', function($fileName) use($app) {
         'canDelete' => 'god' === $user['group'],
 
         'baseDir' => $app['base_dir'][0],
-        'fileName' => helper::decodeFileName($fileName),
+        'fileName' => $fileName,
 
         'langSource' => (string)$oXml->file['source-language'],
         'langTarget' => (string)$oXml->file['target-language'],
