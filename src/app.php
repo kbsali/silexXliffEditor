@@ -82,9 +82,9 @@ $app->post('/update/{what}/{fileName}/{id}', function($what, $fileName, $id) use
         throw new Exception('Problem parsing xml : ' . $e->getMessage());
     }
     $data = $request->get('data');
-    if(empty($data)) {
+    /*if(empty($data)) {
         return new Response('A');
-    }
+    }*/
     if($what == 'translation') {
         $oXml = xliff::updateTranslationId($oXml, $id, $data);
     } elseif($what == 'comment') {
